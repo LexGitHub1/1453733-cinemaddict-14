@@ -42,52 +42,46 @@ const siteMainNavElement = document.querySelector('.main-navigation');
 render(siteMainNavElement, new FilterView(filters).getElement(), RenderPosition.BEFOREEND);
 render(siteMainNavElement, new NavStatsView().getElement(), RenderPosition.BEFOREEND);
 
-render(siteMainElement, new FilmsContainerView().getElement(), RenderPosition.BEFOREEND);
-
 // Film
 const renderFilm = (filmListElement, film) => {
   const filmCard = new FilmView(film);
 
-  const filmPopupHandler = (element) => {
+  const closePopupHandler = (element) => {
     document.body.classList.remove('hide-overflow');
     document.body.removeChild(element.getElement());
   };
 
-  const onFilmCardItemsClick = () => {
+  filmCard.setItemsClickHandler(() => {
     document.body.classList.add('hide-overflow');
-
     const filmPopup = new PopupView(film, comments);
-    const filmPopupClose = filmPopup.getElement().querySelector('.film-details__close-btn');
 
-    filmPopupClose.addEventListener('click', () => {
-      filmPopupHandler(filmPopup);
+    filmPopup.setCloseClickHandler(() => {
+      closePopupHandler(filmPopup);
     });
 
     const onEscKeyDown = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
         evt.preventDefault();
-        filmPopupHandler(filmPopup);
+        closePopupHandler(filmPopup);
         document.removeEventListener('keydown', onEscKeyDown);
       }
     };
     document.addEventListener('keydown', onEscKeyDown);
 
     document.body.appendChild(filmPopup.getElement());
-  };
-
-  filmCard.getElement().querySelector('.film-card__poster').addEventListener('click', onFilmCardItemsClick);
-  filmCard.getElement().querySelector('.film-card__title').addEventListener('click', onFilmCardItemsClick);
-  filmCard.getElement().querySelector('.film-card__comments').addEventListener('click', onFilmCardItemsClick);
+  });
 
   render(filmListElement, filmCard.getElement(), RenderPosition.BEFOREEND);
 };
 
 // Films List
-if (films.length === 0) {
-  render(siteMainElement, new NoFilmView().getElement(), RenderPosition.BEFOREEND);
-} else {
-  render(siteMainElement, new SortingView().getElement(), RenderPosition.BEFOREEND);
-  const filmsElement = siteMainElement.querySelector('.films');
+const renderFilms = (filmsElement, films) => {
+  if (films.length === 0) {
+    render(siteMainElement, new NoFilmView().getElement(), RenderPosition.BEFOREEND);
+    return;
+  }
+
+  render(filmsElement, new SortingView().getElement(), RenderPosition.BEFOREEND);
   render(filmsElement, new FilmsListView().getElement(), RenderPosition.BEFOREEND);
   const filmsListAllElement = filmsElement.querySelector('.films-list--all');
   const filmsListContainerElement = filmsListAllElement.querySelector('.films-list__container');
@@ -99,12 +93,10 @@ if (films.length === 0) {
   if (films.length > FILM_COUNT_PER_STEP) {
     let renderedFilmsCount = FILM_COUNT_PER_STEP;
 
-    render(filmsListAllElement, new ShowMoreView().getElement(), RenderPosition.BEFOREEND);
+    const showMoreButton = new ShowMoreView();
+    render(filmsListAllElement, showMoreButton.getElement(), RenderPosition.BEFOREEND);
 
-    const showMoreButton = filmsElement.querySelector('.films-list__show-more');
-
-    showMoreButton.addEventListener('click', (evt) => {
-      evt.preventDefault();
+    showMoreButton.setClickHandler(() => {
       films
         .slice(renderedFilmsCount, renderedFilmsCount + FILM_COUNT_PER_STEP)
         .forEach((film) => renderFilm(filmsListContainerElement, film));
@@ -112,7 +104,7 @@ if (films.length === 0) {
       renderedFilmsCount += FILM_COUNT_PER_STEP;
 
       if (renderedFilmsCount >= films.length) {
-        showMoreButton.remove();
+        showMoreButton.getElement().remove();
       }
     });
   }
@@ -134,7 +126,11 @@ if (films.length === 0) {
   for (let i = 0; i < COMMENTED_COUNT; i++) {
     renderFilm(filmsListCommentedContainerElement, filmsTopCommented[i]);
   }
-}
+};
+
+const filmsContainer = new FilmsContainerView();
+render(siteMainElement, filmsContainer.getElement(), RenderPosition.BEFOREEND);
+renderFilms(filmsContainer.getElement(), films);
 
 // Footer Stats
 const siteFooterElement = document.querySelector('.footer');
