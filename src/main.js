@@ -9,15 +9,13 @@ import FilmListPresenter from './presenter/film-list.js';
 
 // Mocks
 import {generateUserRating} from './mock/user-rating.js';
-import {generateCommentsList} from './mock/comment.js';
 import {generateFilms} from './mock/film.js';
 import {generateFilter} from './mock/filter.js';
 import {generateFooterStats} from './mock/footer-stats.js';
 
 const FILM_COUNT = 20;
 
-const comments = generateCommentsList();
-const films = generateFilms(FILM_COUNT, comments);
+const films = generateFilms(FILM_COUNT);
 
 const filters = generateFilter(films);
 const footerStats = generateFooterStats(films);
@@ -33,7 +31,7 @@ render(siteMainNavElement, new FilterView(filters), RenderPosition.BEFOREEND);
 render(siteMainNavElement, new NavStatsView(), RenderPosition.BEFOREEND);
 
 const filmListPresenter = new FilmListPresenter(siteMainElement);
-filmListPresenter.init(films, comments);
+filmListPresenter.init(films);
 
 // Footer Stats
 const siteFooterElement = document.querySelector('.footer');
