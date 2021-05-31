@@ -1,19 +1,7 @@
 import AbstractView from './abstract.js';
-import {getTruncatedText, formatFilmCardDate} from '../utils/film.js';
+import {getTruncatedText, getFilmCardDate, getPluralized, getHumanizedDuration} from '../utils/film.js';
 
-const commentCountTemplate = (comments) => {
-  let commentResult = '';
-  const commentLength = comments.length;
-  if (commentLength === 1) {
-    commentResult = commentLength + ' comment';
-  } else if (commentLength > 1) {
-    commentResult = commentLength + ' comments';
-  } else {
-    commentResult = 'No comments';
-  }
-
-  return commentResult;
-};
+const MAX_DESCRIPTION_SIZE = 140;
 
 const createFilmCardTemplate = (film) => {
   const {
@@ -25,27 +13,27 @@ const createFilmCardTemplate = (film) => {
     genres,
     description,
     comments,
-    isWatchListed,
-    isWatched,
-    isFavorite,
+    watchListed,
+    watched,
+    favorite,
   } = film;
 
-  const watchListClassName = isWatchListed ? 'film-card__controls-item--active' : '';
-  const watchedClassName = isWatched ? 'film-card__controls-item--active' : '';
-  const favoriteClassName = isFavorite ? 'film-card__controls-item--active' : '';
-  const commentCount = commentCountTemplate(comments);
+  const watchListClassName = watchListed ? 'film-card__controls-item--active' : '';
+  const watchedClassName = watched ? 'film-card__controls-item--active' : '';
+  const favoriteClassName = favorite ? 'film-card__controls-item--active' : '';
+  const commentCount = comments.length;
 
   return `<article class="film-card">
     <h3 class="film-card__title">${title}</h3>
     <p class="film-card__rating">${rating}</p>
     <p class="film-card__info">
-      <span class="film-card__year">${formatFilmCardDate(releaseDate)}</span>
-      <span class="film-card__duration">${duration}</span>
+      <span class="film-card__year">${getFilmCardDate(releaseDate)}</span>
+      <span class="film-card__duration">${getHumanizedDuration(duration)}</span>
       <span class="film-card__genre">${genres[0]}</span>
     </p>
     <img src="${poster}" alt="" class="film-card__poster">
-    <p class="film-card__description">${getTruncatedText(description)}</p>
-    <a class="film-card__comments">${commentCount}</a>
+    <p class="film-card__description">${getTruncatedText(description, MAX_DESCRIPTION_SIZE)}</p>
+    <a class="film-card__comments">${commentCount} ${getPluralized(commentCount, 'comment')}</a>
     <div class="film-card__controls">
       <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist ${watchListClassName}" type="button">Add to watchlist</button>
       <button class="film-card__controls-item button film-card__controls-item--mark-as-watched ${watchedClassName}" type="button">Mark as watched</button>
@@ -69,26 +57,6 @@ export default class Film extends AbstractView {
     return createFilmCardTemplate(this._film);
   }
 
-  _itemsClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.itemsClick();
-  }
-
-  _favoriteClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.favoriteClick();
-  }
-
-  _watchlistClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.watchlistClick();
-  }
-
-  _watchedClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.watchedClick();
-  }
-
   setItemsClickHandler(callback) {
     this._callback.itemsClick = callback;
 
@@ -110,5 +78,25 @@ export default class Film extends AbstractView {
   setWatchedClickHandler(callback) {
     this._callback.watchedClick = callback;
     this.getElement().querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this._watchedClickHandler);
+  }
+
+  _itemsClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.itemsClick();
+  }
+
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
+  _watchlistClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchlistClick();
+  }
+
+  _watchedClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchedClick();
   }
 }

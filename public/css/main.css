@@ -248,7 +248,6 @@ button {
   color: var(--text-color);
   margin-right: 40px;
   padding: var(--vertical-gap) 0;
-  text-transform: capitalize;
 }
 
 .main-navigation__item:first-child {
@@ -261,6 +260,7 @@ button {
   font-weight: 500;
   padding: 0 10px;
   width: 1em;
+  pointer-events: none;
 }
 
 .main-navigation__additional {
@@ -766,6 +766,30 @@ button {
 .film-details__control-input:checked + .film-details__control-label--favorite::before {
   background-image: url("../images/icons/icon-favorite-active.svg");
 }
+
+
+.film-details__control-input + .film-details__control-label--watchlist::after {
+  content: "Add to watchlist";
+}
+.film-details__control-input:checked + .film-details__control-label--watchlist::after {
+  content: "Added to watchlist";
+}
+
+.film-details__control-input + .film-details__control-label--watched::after {
+  content: "Mark as watched";
+}
+.film-details__control-input:checked + .film-details__control-label--watched::after {
+  content: "Already watched";
+}
+
+.film-details__control-input + .film-details__control-label--favorite::after {
+  content: "Add to favorites";
+}
+.film-details__control-input:checked + .film-details__control-label--favorite::after {
+  content: "Added to favorites";
+}
+
+
 .film-details__comment {
   display: flex;
   margin-bottom: 24px;
@@ -807,6 +831,9 @@ button {
   border-radius: 50%;
   opacity: 0.5;
   transition: all 0.4s;
+}
+.film-details__emoji-label img {
+  pointer-events: none;
 }
 .film-details__emoji-label:hover {
   opacity: 1;
@@ -1104,4 +1131,35 @@ button {
   min-height: 300px;
   padding-top: 50px;
   padding-bottom: 50px;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+      transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+      transform: translateX(-5px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+      transform: translateX(5px);
+  }
+}
+
+.shake {
+  animation: shake 0.6s;
 }
