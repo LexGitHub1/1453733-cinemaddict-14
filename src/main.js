@@ -1,38 +1,61 @@
-import HeaderProfileView from './view/profile.js';
 import MainNavView from './view/main-nav.js';
-import FilterView from './view/main-nav-filter.js';
-import NavStatsView from './view/main-nav-stats.js';
-import FooterStatsView from './view/footer-stats.js';
-import {render, RenderPosition} from './utils/render.js';
+import StatsView from './view/stats.js';
+import {render, remove, RenderPosition} from './utils/render.js';
+import {NavItem, UpdateType} from './const.js';
 
 import FilmListPresenter from './presenter/film-list.js';
+import FilterPresenter from './presenter/filter.js';
 
-// Mocks
-import {generateUserRating} from './mock/user-rating.js';
-import {generateFilms} from './mock/film.js';
-import {generateFilter} from './mock/filter.js';
-import {generateFooterStats} from './mock/footer-stats.js';
+// Models
+import FilmsModel from './model/films.js';
+import CommentsModel from './model/comments.js';
+import FilterModel from './model/filter.js';
 
-const FILM_COUNT = 20;
+import Api from './api.js';
 
-const films = generateFilms(FILM_COUNT);
-
-const filters = generateFilter(films);
-const footerStats = generateFooterStats(films);
-
-const siteHeaderElement = document.querySelector('.header');
-render(siteHeaderElement, new HeaderProfileView(generateUserRating()), RenderPosition.BEFOREEND);
+const AUTHORIZATION = 'Basic fRxjCTzZVTjPgAAeA';
+const END_POINT = 'https://14.ecmascript.pages.academy/cinemaddict';
 
 const siteMainElement = document.querySelector('.main');
-render(siteMainElement, new MainNavView(), RenderPosition.AFTERBEGIN);
 
-const siteMainNavElement = document.querySelector('.main-navigation');
-render(siteMainNavElement, new FilterView(filters), RenderPosition.BEFOREEND);
-render(siteMainNavElement, new NavStatsView(), RenderPosition.BEFOREEND);
+const api = new Api(END_POINT, AUTHORIZATION);
 
-const filmListPresenter = new FilmListPresenter(siteMainElement);
-filmListPresenter.init(films);
+const commentsModel = new CommentsModel();
+const filmsModel = new FilmsModel();
+const filterModel = new FilterModel();
 
-// Footer Stats
-const siteFooterElement = document.querySelector('.footer');
-render(siteFooterElement, new FooterStatsView(footerStats), RenderPosition.BEFOREEND);
+const mainNavElement = new MainNavView();
+
+const filmListPresenter = new FilmListPresenter(siteMainElement, filmsModel, filterModel, commentsModel, api);
+const filterPresenter = new FilterPresenter(mainNavElement, filterModel, filmsModel);
+
+let statsComponent = null;
+
+const handleNavClick = (navItem) => {
+  switch (navItem) {
+    case NavItem.FILMS:
+      filmListPresenter.show();
+      remove(statsComponent);
+      break;
+    case NavItem.STATS:
+      filmListPresenter.hide();
+      statsComponent = new StatsView(filmsModel.get());
+      render(siteMainElement, statsComponent, RenderPosition.BEFOREEND);
+      break;
+  }
+};
+
+filmListPresenter.init();
+filterPresenter.init();
+
+api.getFilms()
+  .then((films) => {
+    filmsModel.set(UpdateType.INIT, films);
+    render(siteMainElement, mainNavElement, RenderPosition.AFTERBEGIN);
+    mainNavElement.setNavClickHandler(handleNavClick);
+  })
+  .catch(() => {
+    filmsModel.set(UpdateType.INIT, []);
+    render(siteMainElement, mainNavElement, RenderPosition.AFTERBEGIN);
+    mainNavElement.setNavClickHandler(handleNavClick);
+  });
