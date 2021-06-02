@@ -36,7 +36,6 @@ export default class FilmList {
     this._siteHeaderElement = document.querySelector('.header');
     this._siteFooterElement = document.querySelector('.footer');
 
-    // List
     this._filmHolder = new FilmsHolderView();
     this._filmListComponent = new FilmsListView();
     this._filmListInnerComponent = new FilmsListInnerView();
