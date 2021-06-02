@@ -40,7 +40,6 @@ export const sortFilmRating = (filmA, filmB) => {
   return filmA.rating > filmB.rating ? -1 : 1;
 };
 
-// source https://www.30secondsofcode.org/js/s/pluralize
 export const getPluralized = (val, word, plural = word + 's') => {
   const _pluralize = (num, word, plural = word + 's') =>
     [1, -1].includes(Number(num)) ? word : plural;

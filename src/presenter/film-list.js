@@ -54,9 +54,9 @@ export default class FilmList {
   }
 
   init() {
-    render(this._filmListContainer, this._filmHolder, RenderPosition.BEFOREEND); // .films
-    render(this._filmHolder, this._filmListComponent, RenderPosition.BEFOREEND); // .films-list
-    render(this._filmListComponent, this._filmListInnerComponent, RenderPosition.BEFOREEND); // .films-list__container
+    render(this._filmListContainer, this._filmHolder, RenderPosition.BEFOREEND);
+    render(this._filmHolder, this._filmListComponent, RenderPosition.BEFOREEND);
+    render(this._filmListComponent, this._filmListInnerComponent, RenderPosition.BEFOREEND);
 
     this._renderFilmList();
   }
