@@ -1,7 +1,6 @@
 # Проект «Киноман»
 
 * Студент: [Александр Панков](https://up.htmlacademy.ru/ecmascript/14/user/1453733).
-* Наставник: [Кирилл Коломин](https://htmlacademy.ru/profile/id633235).
 
 ---
 
